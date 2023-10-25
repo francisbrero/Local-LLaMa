@@ -1,0 +1,8 @@
+scrapy
+beautifulsoup4
+chromadb
+chromadb-client
+sentence-transformers
+ctransformers
+langchain
+llama-cpp-python
