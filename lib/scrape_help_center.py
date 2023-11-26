@@ -3,10 +3,11 @@ from scrapy.linkextractors import LinkExtractor
 
 class Spider(scrapy.Spider):
     name = 'website'
-    allowed_domains = ['www.madkudu.com/']
+    allowed_domains = ['support.madkudu.com/']
     start_urls = [
-        'https://www.madkudu.com',
-        'https://www.madkudu.com/blog'
+        'https://support.madkudu.com/'
+        # ,'https://www.madkudu.com'
+        # ,'https://www.madkudu.com/blog'
     ]
 
     def parse(self, response):
