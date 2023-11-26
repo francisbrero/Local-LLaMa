@@ -11,13 +11,13 @@ source env/bin/activate
 ```
 ### install requirements
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt --upgrade
 ```
 ### Deactivate virtual environment
 ```bash
 deactivate
 ```
-### Configure environment variables
+## Configure environment variables
 There is a `.env_sample` file. Rename it to `.env` and fill in the values.
 
 ## VectorDB
@@ -33,6 +33,11 @@ brew install docker-compose
 Follow the instructions [here](https://docs.trychroma.com/deployment).
 ```bash
 git clone git@github.com:chroma-core/chroma.git
+```
+
+### Run chroma
+Start docker
+```bash
 cd chroma
 docker-compose up -d --build
 ```
@@ -59,43 +64,21 @@ If you see a JSON with a nanosecond EPOC timestamp, you're all set!
 We will run llama2 locally.
 Original instructions from [this article](https://medium.com/@auslei/llama-2-for-mac-m1-ed67bbd9a0c2)
 
-Just in case, updated instructions are also [here](./docs/install_llama.md). There's quite a bit that no longer works in their documentation.
+Just in case, updated instructions for an M2 are also [here](./docs/install_llama.md). There's quite a bit that no longer works in their documentation.
 
 ### Test LLM
 ```bash
-llm -m l2c 'Tell me a joke about a Kudu'
+../../llama.cpp/main -m ../../llama/llama-2-7b-chat/ggml-model-f16_q4_0.gguf \
+        -t 8 \
+        -n 128 \
+        -p 'The first man on the moon was '
 ```
 
 # Run
-## Create scraper
+## Get all the conent from zendesk using their API
 ```bash
-python -m scrapy startproject crawler
+python ./lib/get_zendesk_content.py
 ```
-This will create a folder `crawler`
-
-## Copy the scraper into our server
-```bash
-cd crawler
-cp ../lib/scrape_help_center.py ./crawler/spiders/crawler.py
-```
-
-## Update the settings.py with 
-```
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'
-```
-## Test
-```bash
-scrapy crawl website -o ../data/scraped_urls_website.json
-# scrapy crawl help_center -o ../data/scraped_urls_support.json
-```
-
-## Scraping data
-### Start with getting the urls by scraping the help center
-```bash
-scrapy crawl website -o ../data/scraped_urls_website.json
-```
-
-### Then, get the data from Notion
 
 ## Train the model
 

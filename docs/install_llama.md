@@ -1,3 +1,13 @@
+# Alternative version
+[source](https://gist.github.com/cedrickchee/e8d4cb0c4b1df6cc47ce8b18457ebde0)
+
+
+# 0. install dependencies
+```bash
+brew install pkgconfig cmake
+```
+
+
 # 1. Download official facebook model
 The github location for facebook llama 2 is below: https://github.com/facebookresearch/llama
 
@@ -33,6 +43,10 @@ Then install brew and xcode command line tools and make the binary:
 xcode-select –install 
 ```
 ```bash
+brew install pkgconfig cmake
+```
+
+```bash
 cd llama.cpp
 
 LLAMA_METAL=1 make
@@ -41,13 +55,17 @@ LLAMA_METAL=1 make
 The next step is to convert download model to the ggml format (https://ggml.ai/), the following create a virtual environment, install the required packages and convert the llama 7b chat model:
 
 ```bash
-python3 -m venv .env
-source .env/bin/activate
+python3 -m venv env
+source env/bin/activate
 pip install -r requirements.txt
 ```
 
 ```bash
-python convert.py ../llama/llama-2-7b-chat
+pip install --pre torch torchvision --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+```
+
+```bash
+python convert.py ../llama/llama-2-7b-chat 1
 ```
 
 This will generate the another file under the model you’ve downloaded on facebook. I didn’t generate a name as I was lazy, the filename should look like ggml-model-f16.gguf.
@@ -58,19 +76,30 @@ To quantize the model (make it smaller), the following quantize the model from F
 ```
 It is almost done, and you can see a significant size reduction from 14gigs to 3gigs.
 
+## test the model you've built
+```bash
+./main -m ../llama/llama-2-7b-chat/ggml-model-f16_q4_0.gguf \
+        -t 8 \
+        -n 128 \
+        -p 'A Kudu is a form of antelope '
+```
+This should feel magical! LLaMa is running on your Macbook!
+
+
 # 3. Use python binding via llama-cpp-python
 To use it in python, we can install another helpful package. The installation of package is same as any other package, but make sure you enable metal.
 ```bash
 CMAKE_ARGS="-DLLAMA_METAL=on" FORCE_CMAKE=1 pip install llama-cpp-python
 ```
-Using the model
+## Using the model
 To use the model, I have created a sample code below. The prompt instruction is what I have dugged up on reddit. 
 ```bash
 from llama_cpp import Llama
 
-model_path = "~/Documents/llama/llama-2-7b-chat/ggml-model-f32_q4_0.bin"
+model_path = "~/Documents/llama/llama-2-7b-chat/ggml-model-f16_q4_0.gguf"
 model = Llama(model_path = model_path,
               n_ctx = 2048,            # context window size
+              n_gqa=8, #
               n_gpu_layers = 1,        # enable GPU
               use_mlock = True)        # enable memory lock so not swap
 
