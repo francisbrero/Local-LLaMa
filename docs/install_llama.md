@@ -97,11 +97,18 @@ To use the model, I have created a sample code below. The prompt instruction is 
 from llama_cpp import Llama
 
 model_path = "~/Documents/llama/llama-2-7b-chat/ggml-model-f16_q4_0.gguf"
-model = Llama(model_path = model_path,
-              n_ctx = 2048,            # context window size
-              n_gqa=8, #
-              n_gpu_layers = 1,        # enable GPU
-              use_mlock = True)        # enable memory lock so not swap
+model = Llama(model_path = model_path,       
+              , temperature=0.75
+              , max_tokens=2000
+              , n_gqa=8 # Number of GPUs to use
+              , top_p=1
+              , verbose=True # Verbose is required to pass to the callback manager
+              , f16_kv=True  # MUST set to True, otherwise you will run into problem after a couple of calls
+              , n_ctx=2048 # context window size
+              , n_batch=512 # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
+              , n_gpu_layers=1 # Metal set to 1 is enough.
+              , use_mlock = True # enable memory lock so not swap
+              )        
 
 
 prompt = """
@@ -134,4 +141,11 @@ from langchain.llms import LlamaCpp
 llm = LlamaCpp(model_path=model_path)
 
 llm(prompt)
+```
+
+Note:
+The console log will show the following log to indicate Metal was enable properly.
+```bash
+ggml_metal_init: allocating
+ggml_metal_init: found device: Apple M2
 ```
